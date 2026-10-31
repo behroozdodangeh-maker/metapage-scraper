@@ -3,7 +3,7 @@ import requests
 url = "https://chat.metapageiran.ir/wp-json/metapage/v1/add-lead"
 headers = {
     "Content-Type": "application/json",
-    "X-API-TOKEN": "YOUR_SECRET_PYTHON_TOKEN_123" # همان توکن تنظیمات وردپرس
+    "X-API-TOKEN": "FAd6fLyVSgHXRgVxT3BlbkFJOe24MdYjQkCYGazR928XkTg5om4yT7Cc2-yZrItc5cO-aCt" # همان توکن تنظیمات وردپرس
 }
 data = {
     "name": "تست دستی از بیرون",
