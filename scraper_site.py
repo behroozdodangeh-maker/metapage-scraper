@@ -6,7 +6,7 @@ import time
 WP_API_URL = "https://chat.metapageiran.ir/wp-json/metapage/v1/add-lead"
 API_TOKEN = "FAd6fLyVSgHXRgVxT3BlbkFJOe24MdYjQkCYGazR928XkTg5om4yT7Cc2-yZrItc5cO-aCt"
 
-SEARCH_QUERY = 'site:instagram.com ("ارسال به سراسر کشور" OR "سفارش دایرکت") ("تهران" OR "کرج") "09"'
+SEARCH_QUERY = 'site:instagram.com "تهران" "+98"'
 GOOGLE_SEARCH_URL = f"https://www.google.com/search?q={SEARCH_QUERY}&num=10"
 
 headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"}
