@@ -4,8 +4,8 @@ import re
 import time
 
 # تنظیمات اتصال به سایت متاپیج
-WP_API_URL = "https://your-site.com/wp-json/metapage/v1/add-lead"
-API_TOKEN = "YOUR_SECRET_PYTHON_TOKEN_123"
+WP_API_URL = "https://chat.metapageiran.ir/wp-json/metapage/v1/add-lead"
+API_TOKEN = "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"
 
 # تنظیمات جستجو (مثلاً پیدا کردن سالن‌های زیبایی در تهران که پیج اینستاگرام دارند)
 SEARCH_QUERY = 'site:instagram.com "تهران" "سالن زیبایی" "09"'
