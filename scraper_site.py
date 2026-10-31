@@ -18,7 +18,7 @@ def run_scraper():
     test_lead = {
         "name": "مشتری تستی از گیت‌هاب",
         "instagram": "https://instagram.com/test_github_client",
-        "phone": "09123456789",
+        "phone": "09199998888", # یک شماره کاملاً جدید برای تست
         "details": "این لید به صورت اتوماتیک از طرف ربات گیت‌هاب ارسال شده است.",
         "campaign": "metapage_site"
     }
