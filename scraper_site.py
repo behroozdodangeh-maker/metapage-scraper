@@ -4,7 +4,7 @@ import re
 import time
 
 WP_API_URL = "https://chat.metapageiran.ir/wp-json/metapage/v1/add-lead"
-API_TOKEN = "توکن_امنیت_شما" # توکن خودتان را اینجا بگذارید
+API_TOKEN = "FAd6fLyVSgHXRgVxT3BlbkFJOe24MdYjQkCYGazR928XkTg5om4yT7Cc2-yZrItc5cO-aCt"
 
 # جستجوی آزادتر در گوگل برای پیدا کردن اینستاگرام یا تلگرام کسب‌وکارها در تهران
 SEARCH_QUERY = 'site:instagram.com OR site:t.me "تهران" ("سفارش" OR "خدمات" OR "ارسال")'
