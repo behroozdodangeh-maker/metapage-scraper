@@ -3,16 +3,26 @@ from bs4 import BeautifulSoup
 import re
 import time
 
-# تنظیمات اتصال به سایت متاپیج
+# تنظیمات اتصال به وردپرس (اطمینان حاصل کنید که آدرس و توکن صحیح هستند)
 WP_API_URL = "https://chat.metapageiran.ir/wp-json/metapage/v1/add-lead"
-API_TOKEN = "FAd6fLyVSgHXRgVxT3BlbkFJOe24MdYjQkCYGazR928XkTg5om4yT7Cc2-yZrItc5cO-aCt"
+API_TOKEN = "FAd6fLyVSgHXRgVxT3BlbkFJOe24MdYjQkCYGazR928XkTg5om4yT7Cc2-yZrItc5cO-aCt" # باید با مقدار توی تنظیمات وردپرس یکی باشد
 
-# تنظیمات جستجو (مثلاً پیدا کردن سالن‌های زیبایی در تهران که پیج اینستاگرام دارند)
-SEARCH_QUERY = 'site:instagram.com "تهران" "سالن زیبایی" "09"'
+# انتخاب نوع کمپین هدف برای این دور از جستجو:
+# گزینه‌ها: 'metapage_site' | 'behapp_3dviewer' | 'ads_billboard' | 'meta_global_expo'
+TARGET_CAMPAIGN = 'behapp_3dviewer' 
+
+# تنظیمات جستجو بر اساس کمپین
+if TARGET_CAMPAIGN == 'behapp_3dviewer':
+    SEARCH_QUERY = 'site:instagram.com "معمار" OR "طراح داخلی" "تهران" "09"'
+elif TARGET_CAMPAIGN == 'ads_billboard':
+    SEARCH_QUERY = 'site:instagram.com "آژانس تبلیغاتی" OR "برندینگ" "تهران" "09"'
+else:
+    SEARCH_QUERY = 'site:instagram.com "سالن زیبایی" OR "کلینیک" "تهران" "09"'
+
 GOOGLE_SEARCH_URL = f"https://www.google.com/search?q={SEARCH_QUERY}&num=20"
 
 headers = {
-    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36"
+    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
 }
 
 def extract_phone_numbers(text):
@@ -21,12 +31,13 @@ def extract_phone_numbers(text):
     matches = re.findall(pattern, text.replace(" ", "").replace("-", ""))
     return list(set(matches))
 
-def send_lead_to_wordpress(name, ig_url, phone, bio_text):
+def send_lead_to_wordpress(name, ig_url, phone, bio_text, campaign_type):
     data = {
         "name": name,
         "instagram": ig_url,
         "phone": phone,
-        "details": bio_text
+        "details": bio_text,
+        "campaign": campaign_type # ارسال نوع کمپین به وردپرس
     }
     
     req_headers = {
@@ -34,38 +45,55 @@ def send_lead_to_wordpress(name, ig_url, phone, bio_text):
         "X-API-TOKEN": API_TOKEN
     }
     
-    response = requests.post(WP_API_URL, json=data, headers=req_headers)
-    print(f"ارسال به وردپرس: {ig_url} | پاسخ سرور: {response.text}")
+    try:
+        response = requests.post(WP_API_URL, json=data, headers=req_headers, timeout=20)
+        print(f"ارسال به وردپرس: {ig_url} | پاسخ سرور: {response.text}")
+    except Exception as e:
+        print(f"خطا در ارسال به وردپرس: {e}")
 
 def run_scraper():
-    print("شروع جستجو در گوگل...")
-    response = requests.get(GOOGLE_SEARCH_URL, headers=headers)
+    print(f"شروع جستجو در گوگل برای کمپین: {TARGET_CAMPAIGN} ...")
+    try:
+        response = requests.get(GOOGLE_SEARCH_URL, headers=headers, timeout=15)
+    except Exception as e:
+        print(f"خطا در اتصال به گوگل: {e}")
+        return
     
     if response.status_code != 200:
-        print("خطا در دریافت نتایج گوگل")
+        print(f"خطا در دریافت نتایج گوگل. کد وضعیت: {response.status_code} (احتمال بلاک شدن موقت آی‌پی)")
         return
 
     soup = BeautifulSoup(response.text, 'html.parser')
-    search_results = soup.find_all('div', class_='g')
+    
+    # ساختار جستجوی گوگل ممکن است تگ‌ها را تغییر دهد؛ از روش عمومی‌تر استفاده می‌کنیم
+    search_results = soup.select('div.g')
+    
+    if not search_results:
+        print("هیچ نتیجه‌ای یافت نشد یا ساختار صفحه گوگل تغییر کرده است.")
+        return
 
+    found_count = 0
     for result in search_results:
         link_tag = result.find('a', href=True)
-        snippet_tag = result.find('div', class_='VwiC3b') # کلاس توضیحات گوگل (ممکن است تغییر کند)
+        # یافتن بلوک توضیحات با چند کلاس رایج گوگل
+        snippet_tag = result.find('div', class_=['VwiC3b', 'yXK7lf', 'IsZvec'])
         
-        if link_tag and snippet_tag and "instagram.com" in link_tag['href']:
+        if link_tag and "instagram.com" in link_tag['href']:
             ig_url = link_tag['href']
-            snippet_text = snippet_tag.text
+            snippet_text = snippet_tag.text if snippet_tag else "اطلاعات پیش‌فرض پیج اینستاگرام"
             
             # استخراج نام پیج از URL
             page_name = ig_url.rstrip('/').split('/')[-1]
             
-            # پیدا کردن شماره‌ها در توضیحات ایندکس شده
+            # پیدا کردن شماره‌ها در توضیحات
             phones = extract_phone_numbers(snippet_text)
             
             if phones:
-                # ارسال اولین شماره پیدا شده به وردپرس
-                send_lead_to_wordpress(f"پیج {page_name}", ig_url, phones[0], snippet_text)
-                time.sleep(2) # وقفه برای جلوگیری از فشار به سرور
+                send_lead_to_wordpress(f"پیج {page_name}", ig_url, phones[0], snippet_text, TARGET_CAMPAIGN)
+                found_count += 1
+                time.sleep(3) # وقفه برای جلوگیری از فشار به سرور
+
+    print(f"پایان جستجو. تعداد {found_count} لید جدید پردازش شد.")
 
 if __name__ == "__main__":
     run_scraper()
