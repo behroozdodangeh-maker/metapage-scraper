@@ -22,11 +22,11 @@ def run_scraper():
     try:
         response = requests.get(GOOGLE_SEARCH_URL, headers=headers, timeout=10)
     except Exception as e:
-        print(f"خطا در ارتباط با گوگل: {e}")
+        print(f"خطا در اتصال به گوگل: {e}")
         return
 
     if response.status_code != 200:
-        print(f"گوگل کد وضعیت {response.status_code} را برگرداند.")
+        print(f"کد وضعیت نامعتبر از گوگل: {response.status_code}")
         return
 
     soup = BeautifulSoup(response.text, 'html.parser')
@@ -59,7 +59,7 @@ def run_scraper():
                         },
                         timeout=20
                     )
-                    print(f"ارسال لید {page_name}: وضعیت {res.status_code} - {res.text}")
+                    print(f"ارسال لید {page_name}: کد {res.status_code} - {res.text}")
                 except Exception as e:
                     print(f"خطا در ارسال به وردپرس: {e}")
                 time.sleep(2)
