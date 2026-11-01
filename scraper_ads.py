@@ -36,13 +36,14 @@ def run_scraper():
             phones = extract_phone_numbers(snippet_text)
             
             if phones:
-                data = {
-                    "name": f"آژانس {page_name}",
-                    "instagram": ig_url,
-                    "phone": phones[0],
-                    "details": snippet_text,
-                    "campaign": "ads_billboard"
-                }
+               data = {
+    "api_token": API_TOKEN, # ارسال توکن داخل بدنه JSON برای دور زدن محدودیت هدر هاست
+    "name": f"پیج {page_name}",
+    "instagram": url,
+    "phone": phone_match.group(0),
+    "details": snippet_text,
+    "campaign": "metapage_site"
+}
                 try:
                     requests.post(WP_API_URL, json=data, headers={"Content-Type": "application/json", "X-API-TOKEN": API_TOKEN}, timeout=10)
                 except Exception:
