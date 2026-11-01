@@ -34,12 +34,13 @@ def run_scraper():
             
             if phones:
                 data = {
-                    "name": f"پیج {page_name}",
-                    "instagram": ig_url,
-                    "phone": phones[0],
-                    "details": snippet_text,
-                    "campaign": "metapage_site" # تگ اختصاصی کمپین سایت
-                }
+    "api_token": API_TOKEN, # ارسال توکن داخل بدنه JSON برای دور زدن محدودیت هدر هاست
+    "name": f"پیج {page_name}",
+    "instagram": url,
+    "phone": phone_match.group(0),
+    "details": snippet_text,
+    "campaign": "metapage_site"
+}
                 requests.post(WP_API_URL, json=data, headers={"Content-Type": "application/json", "X-API-TOKEN": API_TOKEN})
                 time.sleep(3)
 
